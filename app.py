@@ -18,7 +18,7 @@ import pdfkit
 from docx import Document
 from docx.shared import Pt
 
-# --- AI Integration ---
+# --- AI Integration ---Carreer_Craft_Web
 import google.generativeai as genai
 
 # ==============================================================================
@@ -47,7 +47,7 @@ db = SQLAlchemy(app)
 
 # --- Gemini API Configuration ---
 # IMPORTANT: The application's AI features will NOT work without this key set in your environment.
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', 'AIzaSyAYkR5arVG7lIGAd-Dl219gm6B-zXAgg9A')  # Replace with your actual API key
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', 'AIzaSyD0_YCI7NUgRDx-tZ-vGXCIwrAah6G9D4w')  # Replace with your actual API key
 AI_FEATURES_ENABLED = bool(GEMINI_API_KEY)
 if AI_FEATURES_ENABLED:
     try:

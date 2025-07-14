@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CareerCraft- Professional Job Application Platform</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
     
@@ -22,37 +23,40 @@
                 <li><a href="#contact" class="nav-link">Contact</a></li>
             </ul>
             <div class="nav-actions">
-                <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
-                    <span class="theme-icon">🌙</span><span class="theme-icon">☀️</span>
+                <button class="theme-toggle" aria-label="Toggle theme">
+                    <span class="theme-icon">🌙</span><span class="theme-icon">☀</span>
                 </button>
-                <div class="hamburger" onclick="toggleMobileMenu()">
+                <div class="hamburger">
                     <span></span><span></span><span></span>
                 </div>
-            </div>
+            </div>
         </nav>
     </header>
 
     <main id="home">
         <!-- Hero Section -->
         <section class="hero">
-            <div id="particle-container"></div>
-            <div class="hero-container">
-                <div class="hero-content">
-                    <h1 class="hero-title">Elevate Your Career to <span class="text-gradient">New Heights</span></h1>
-                    <p class="hero-subtitle">Professional CV optimization, interview mastery, and career advancement tools designed for ambitious professionals.</p>
-                    <div class="hero-cta">
-                        <button class="btn-primary" onclick="scrollToUpload()">Get Started</button>
-                    </div>
-                </div>
-                <div class="hero-visual">
-                    <div class="floating-card">
-                        <div class="card-content">
-                            <div class="success-icon">✓</div>
-                            <p>CV Optimized</p>
-                        </div>
-                    </div>
-                </div>
+        <div class="hero-container">
+            <div class="hero-content">
+            <h1 class="hero-title">Elevate Your Career to <span class="text-gradient">New Heights</span></h1>
+            <p class="hero-subtitle">Professional CV optimization, interview mastery, and career advancement tools designed for ambitious professionals.</p>
+            <div class="hero-cta">
+                <button class="btn-primary" onclick="scrollToUpload()">Get Started</button>
             </div>
+            </div>
+
+            <!-- 👇 Custom Shape Video Container -->
+            <div class="hero-visual custom-svg-shape">
+            <svg viewBox="0 0 267.522 107.039" xmlns="http://www.w3.org/2000/svg">
+                <rect width="267.522" height="107.039" rx="12" ry="12" fill="#2d3639"/>
+            </svg>
+
+            <video class="side-video" autoplay loop muted playsinline preload="true">
+                <source src="https://cdn.enhancv.com/Resume_Builder_Tutorial_68b11fdab1.mp4?updated_at=2023-06-06T07:25:19.216Z" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            </div>
+        </div>
         </section>
 
         <!-- Upload Section -->
@@ -88,25 +92,26 @@
                 </div>
                 <div class="services-grid">
                     <div class="service-card" data-service="cv">
-                        <div class="service-icon">📋</div>
+                        <div class="service-icon"><i class="fas fa-file-alt"></i></div>
                         <h3>CV Services</h3>
                         <p>Professional CV review, ATS optimization, and intelligent rewriting.</p>
                         <button class="service-btn" onclick="navigateToService('cv')">Access Service</button>
                     </div>
                     <div class="service-card" data-service="job-matcher">
-                        <div class="service-icon">🎯</div>
+                        <div class="service-icon"><i class="fas fa-briefcase"></i></div>
                         <h3>Job Matcher</h3>
                         <p>Intelligent job matching and professional email generation.</p>
                         <button class="service-btn" onclick="navigateToService('job-matcher')">Access Service</button>
                     </div>
                     <div class="service-card" data-service="interview">
-                        <div class="service-icon">💬</div>
+                        <div class="service-icon"><i class="fas fa-comments"></i></div>
+
                         <h3>Interview Prep</h3>
                         <p>AI-powered mock interviews and personalized feedback.</p>
                         <button class="service-btn" onclick="navigateToService('interview')">Access Service</button>
                     </div>
                     <div class="service-card" data-service="upskilling">
-                        <div class="service-icon">📚</div>
+                        <div class="service-icon"><i class="fas fa-graduation-cap"></i></div>
                         <h3>Upskilling</h3>
                         <p>Personalized learning paths and skill development resources.</p>
                         <button class="service-btn" onclick="navigateToService('upskilling')">Access Service</button>
@@ -124,7 +129,18 @@
             </div>
             <div class="footer-section">
                 <h4>Developers</h4>
-                <p> OMAR & FATMA </p>
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                    <li>
+                        <a href="https://www.linkedin.com/in/fatma-kasem-33b0902b6/" target="_blank" rel="noopener" style="color: inherit; text-decoration: none;">
+                            FATMA
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.linkedin.com/in/omar-hamed2410/" target="_blank" rel="noopener" style="color: inherit; text-decoration: none;">
+                            OMAR
+                        </a>
+                    </li>
+                </ul>
             </div>
             <div class="footer-section">
                 <h4>Contact</h4>

@@ -32,13 +32,13 @@
             </ul>
 
             <div class="nav-actions">
-                <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
-                    <span class="theme-icon">🌙</span><span class="theme-icon">☀️</span>
+                <button class="theme-toggle" aria-label="Toggle theme">
+                    <span class="theme-icon">🌙</span><span class="theme-icon">☀</span>
                 </button>
-                <div class="hamburger" onclick="toggleMobileMenu()">
+                <div class="hamburger">
                     <span></span><span></span><span></span>
                 </div>
-            </div>
+            </div>
         </nav>
     </header>
 
@@ -56,23 +56,7 @@
     
             <div class="service-content">
                 <!-- ATS Scanner Tab -->
-<<<<<<< HEAD
                 <div class="tab-content active" id="ats">
-=======
-                <div class="tab-content active" id="review">
-                    <div class="content-header">
-                        <h2>ATS Scanner</h2>
-                        <p>Check if your CV passes Applicant Tracking System filters.</p>
-
-                        <button class="btn-primary" onclick="analyzeCV()"> Scan for ATS   </button>
-                    </div>
-                    <div class="results-panel" id="review-results">
-                        <div class="placeholder">Click "Scan for ATS" to see your results.</div>
-                    </div>
-                </div> 
-                <!-- CV Review Tab -->
-                <div class="tab-content" id="ats">
->>>>>>> f40f654bf2da5d662ffacf7bc50b80363e45413a
                     <div class="content-header">
                         <h2>ATS Compatibility Scanner</h2>
                         <p>See how well your CV can be parsed by automated systems. This scan checks for formatting and structural issues, not job-specific content.</p>
@@ -84,7 +68,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- CV Review Tab -->
                 <div class="tab-content" id="review">
                     <div class="content-header">
@@ -92,7 +76,7 @@
                         <p>Get expert feedback on your CV, with detailed analysis, keyword matching, and improvement suggestions.</p>
                     </div>
                     <div class="tool-container">
-                         <div class="input-group">
+                        <div class="input-group">
                             <label for="reviewJobDescription">Job Description (Optional, but recommended)</label>
                             <textarea id="reviewJobDescription" placeholder="For a more targeted review and keyword analysis, paste the job description here..."></textarea>
                         </div>
@@ -102,14 +86,14 @@
                         </div>
                     </div>
                 </div>
-    
+
                 <!-- CV Rewriter Tab -->
                 <div class="tab-content" id="rewriter">
                     <div class="content-header">
                         <h2>CV Rewriter</h2>
                         <p>Let our AI enhance and optimize your CV content to be more impactful.</p>
                     </div>
-                     <div class="tool-container">
+                    <div class="tool-container">
                         <button class="btn-primary" onclick="rewriteCV()">Rewrite My CV</button>
                         <div class="rewriter-output" id="rewriter-output">
                             <div class="placeholder">Click "Rewrite My CV" to get an optimized version.</div>
