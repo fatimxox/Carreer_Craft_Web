@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upskilling & Career Growth - CareerCraft Pro</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="nav-brand">
+                <a href="{{ url_for('land_page') }}" style="text-decoration: none;">
+                    <h1 class="logo">Career<span class="logo-accent">Craft </span></h1>
+                </a>
+            </div>
+
+            <ul class="nav-menu">
+                <li><a href="{{ url_for('cv_services') }}" class="nav-link">CV Services</a></li>
+            </ul>
+
+            <ul class="nav-menu">
+                <li><a href="{{ url_for('job_matcher') }}" class="nav-link">Job Matcher</a></li>
+            </ul>
+
+            <ul class="nav-menu">
+                <li><a href="{{ url_for('interview_preparation') }}" class="nav-link">Interview Prep</a></li>
+            </ul>
+
+            <ul class="nav-menu">
+                <li><a href="{{ url_for('upskilling') }}" class="nav-link">Upskilling</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+                    <span class="theme-icon">🌙</span><span class="theme-icon">☀️</span>
+                </button>
+                <div class="hamburger" onclick="toggleMobileMenu()">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main>
+        <div class="service-page">
+            <div class="service-sidebar">
+                <button class="back-btn" onclick="showLandingPage()">← Back to Home</button>
+                <h3>Upskilling</h3>
+                <ul class="tab-menu">
+                    <li><a href="#" class="tab-link active" data-tab="paths">Career Paths</a></li>
+                    <li><a href="#" class="tab-link" data-tab="projects">Project Suggestions</a></li>
+                    <li><a href="#" class="tab-link" data-tab="course">Mini Course</a></li>
+                </ul>
+            </div>
+    
+            <div class="service-content">
+                <!-- Career Paths Tab -->
+                <div class="tab-content active" id="paths">
+                    <div class="content-header">
+                        <h2>Recommended Career Paths</h2>
+                        <p>Discover potential career paths based on the skills and experience in your CV.</p>
+                         <button class="btn-primary" onclick="loadCareerPaths()">Recommend Paths</button>
+                    </div>
+                    <div class="results-panel" id="career-paths-results">
+                        <div class="placeholder">Click the button to see your recommended career paths.</div>
+                    </div>
+                </div>
+    
+                <!-- Project Suggestions Tab -->
+                <div class="tab-content" id="projects">
+                    <div class="content-header">
+                        <h2>Personalized Project Suggestions</h2>
+                        <p>Get project ideas to build your portfolio and fill skill gaps identified in your CV.</p>
+                        <button class="btn-primary" onclick="loadProjectSuggestions()">Suggest Projects</button>
+                    </div>
+                    <div class="results-panel" id="project-suggestions-results">
+                        <div class="placeholder">Click the button to generate project ideas.</div>
+                    </div>
+                </div>
+    
+                <!-- Mini Course Tab -->
+                <div class="tab-content" id="course">
+                    <div class="content-header">
+                        <h2>Personalized Mini-Course</h2>
+                        <p>Generate a custom mini-course outline to help you learn the skills you need for your next career move.</p>
+                         <button class="btn-primary" onclick="loadMiniCourse()">Generate My Course</button>
+                    </div>
+                     <div class="results-panel" id="mini-course-results">
+                        <div class="placeholder">Click the button to create a personalized course outline.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

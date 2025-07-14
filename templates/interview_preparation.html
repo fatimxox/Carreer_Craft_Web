@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Preparation - CareerCraft Pro</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="nav-brand">
+                <a href="{{ url_for('land_page') }}" style="text-decoration: none;">
+                    <h1 class="logo">Career<span class="logo-accent">Craft </span></h1>
+                </a>
+            </div>
+
+            <ul class="nav-menu">
+                <li><a href="{{ url_for('cv_services') }}" class="nav-link">CV Services</a></li>
+            </ul>
+
+            <ul class="nav-menu">
+                <li><a href="{{ url_for('job_matcher') }}" class="nav-link">Job Matcher</a></li>
+            </ul>
+
+            <ul class="nav-menu">
+                <li><a href="{{ url_for('interview_preparation') }}" class="nav-link">Interview Prep</a></li>
+            </ul>
+
+            <ul class="nav-menu">
+                <li><a href="{{ url_for('upskilling') }}" class="nav-link">Upskilling</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+                    <span class="theme-icon">🌙</span><span class="theme-icon">☀️</span>
+                </button>
+                <div class="hamburger" onclick="toggleMobileMenu()">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main>
+        <div class="service-page">
+            <div class="service-sidebar">
+                <button class="back-btn" onclick="showLandingPage()">← Back to Home</button>
+                <h3>Interview Prep</h3>
+                <ul class="tab-menu">
+                    <li><a href="#" class="tab-link active" data-tab="mock">Mock Interview</a></li>
+                    <li><a href="#" class="tab-link" data-tab="questions">Question Bank</a></li>
+                    <li><a href="#" class="tab-link" data-tab="templates">Answer Templates</a></li>
+                </ul>
+            </div>
+    
+            <div class="service-content">
+                <!-- Mock Interview Tab -->
+                <div class="tab-content active" id="mock">
+                    <div id="interviewSetup">
+                        <div class="content-header">
+                           <h2>AI Mock Interview</h2>
+                           <p>Practice with our AI interviewer and get real-time feedback. Provide an optional job description for tailored questions.</p>
+                       </div>
+                       <div class="input-group">
+                           <label for="mockJobDescription">Job Description (Optional)</label>
+                           <textarea id="mockJobDescription" placeholder="Paste a job description for a more relevant interview..."></textarea>
+                       </div>
+                       <button class="btn-primary" onclick="startInterview()">Start Mock Interview</button>
+                    </div>
+   
+                    <div class="interview-chat" id="interviewChat" style="display: none;">
+                       <div class="chat-header">
+                            <div class="interviewer-info">
+                               <div class="avatar">🤖</div>
+                               <h4>AI Interviewer</h4>
+                           </div>
+                           <div id="questionCounter"></div>
+                           <button class="end-interview" onclick="endInterview()">End & Get Report</button>
+                       </div>
+                       <div class="chat-messages" id="chatMessages"></div>
+                       <div class="chat-input-container">
+                           <input type="text" class="chat-input" placeholder="Type your response..." id="responseInput">
+                           <button class="chat-send" onclick="sendResponse()">➤</button>
+                       </div>
+                    </div>
+   
+                    <div class="interview-feedback results-panel" id="interviewFeedback" style="display: none;">
+                       <!-- Feedback report will be injected here -->
+                    </div>
+                </div>
+    
+                <!-- Question Bank Tab -->
+                <div class="tab-content" id="questions">
+                    <div class="content-header">
+                        <h2>Interview Question Bank</h2>
+                        <p>Generate a list of interview questions based on your CV and an optional job description.</p>
+                    </div>
+                    <div class="tool-container">
+                        <div class="input-group">
+                            <label for="questionsJobDescription">Job Description (Optional)</label>
+                            <textarea id="questionsJobDescription" placeholder="Paste job description for more specific questions..."></textarea>
+                        </div>
+                        <button class="btn-primary" onclick="loadInterviewQuestions()">Generate Questions</button>
+                        <div class="questions-list" id="questions-list">
+                            <div class="placeholder">Click "Generate Questions" to create a question list.</div>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Answer Templates Tab -->
+                <div class="tab-content" id="templates">
+                    <div class="content-header">
+                        <h2>Answer Templates</h2>
+                        <p>Get AI-generated answer templates for any interview question, tailored to your CV.</p>
+                    </div>
+                    <div class="tool-container">
+                       <div class="input-group">
+                           <label for="templateQuestion">Interview Question</label>
+                           <input type="text" id="templateQuestion" placeholder="e.g., 'Tell me about a time you handled a difficult stakeholder.'">
+                       </div>
+                       <button class="btn-primary" onclick="getAnswerTemplate()">Generate Answer Templates</button>
+                       <div class="template-results" id="template-results">
+                           <div class="placeholder">Enter a question and click the button to get answer ideas.</div>
+                       </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

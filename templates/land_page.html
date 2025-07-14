@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareerCraft- Professional Job Application Platform</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    
+    <header class="header">
+        <nav class="nav">
+            <div class="nav-brand">
+                <a href="{{ url_for('land_page') }}" style="text-decoration: none;">
+                    <h1 class="logo">Career<span class="logo-accent">Craft </span></h1>
+                </a>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link">Home</a></li>
+                <li><a href="#services" class="nav-link">Services</a></li>
+                <li><a href="#about" class="nav-link">About</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+                    <span class="theme-icon">🌙</span><span class="theme-icon">☀️</span>
+                </button>
+                <div class="hamburger" onclick="toggleMobileMenu()">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main id="home">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div id="particle-container"></div>
+            <div class="hero-container">
+                <div class="hero-content">
+                    <h1 class="hero-title">Elevate Your Career to <span class="text-gradient">New Heights</span></h1>
+                    <p class="hero-subtitle">Professional CV optimization, interview mastery, and career advancement tools designed for ambitious professionals.</p>
+                    <div class="hero-cta">
+                        <button class="btn-primary" onclick="scrollToUpload()">Get Started</button>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="floating-card">
+                        <div class="card-content">
+                            <div class="success-icon">✓</div>
+                            <p>CV Optimized</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Upload Section -->
+        <section class="upload-section" id="upload">
+            <div class="container">
+                <div class="upload-header">
+                    <h2 class="section-title">Upload Your CV to Unlock All Services</h2>
+                    <p class="section-subtitle">Let our AI analyze your profile and provide personalized career guidance.</p>
+                </div>
+                <div class="upload-container">
+                    <div class="upload-box" id="uploadBox" onclick="document.getElementById('cvUpload').click()">
+                        <div class="upload-icon">📄</div>
+                        <h3>Drop your CV here or click to browse</h3>
+                        <p>Supports PDF, DOCX, TXT (Max 16MB)</p>
+                        <input type="file" id="cvUpload" name="cv_file" accept=".pdf,.docx,.txt" hidden onchange="handleFileUpload(this.files[0])">
+                        <button type="button" class="upload-btn">Choose File</button>
+                    </div>
+                    <div class="upload-success" id="uploadSuccess" style="display: none;">
+                        <div class="success-icon">✓</div>
+                        <h3>CV Uploaded Successfully!</h3>
+                        <p>Ready to access all premium services.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services Section -->
+        <section class="services-section" id="services">
+            <div class="container">
+                <div class="services-header">
+                    <h2 class="section-title">Premium Career Services</h2>
+                    <p class="section-subtitle">Comprehensive tools to transform your job search.</p>
+                </div>
+                <div class="services-grid">
+                    <div class="service-card" data-service="cv">
+                        <div class="service-icon">📋</div>
+                        <h3>CV Services</h3>
+                        <p>Professional CV review, ATS optimization, and intelligent rewriting.</p>
+                        <button class="service-btn" onclick="navigateToService('cv')">Access Service</button>
+                    </div>
+                    <div class="service-card" data-service="job-matcher">
+                        <div class="service-icon">🎯</div>
+                        <h3>Job Matcher</h3>
+                        <p>Intelligent job matching and professional email generation.</p>
+                        <button class="service-btn" onclick="navigateToService('job-matcher')">Access Service</button>
+                    </div>
+                    <div class="service-card" data-service="interview">
+                        <div class="service-icon">💬</div>
+                        <h3>Interview Prep</h3>
+                        <p>AI-powered mock interviews and personalized feedback.</p>
+                        <button class="service-btn" onclick="navigateToService('interview')">Access Service</button>
+                    </div>
+                    <div class="service-card" data-service="upskilling">
+                        <div class="service-icon">📚</div>
+                        <h3>Upskilling</h3>
+                        <p>Personalized learning paths and skill development resources.</p>
+                        <button class="service-btn" onclick="navigateToService('upskilling')">Access Service</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer" id="contact">
+        <div class="footer-content">
+            <div class="footer-section" id="about">
+                <h3>About CareerCraft </h3>
+                <p>Empowering professionals to achieve their career aspirations with AI-driven tools.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Developers</h4>
+                <p> OMAR & FATMA </p>
+            </div>
+            <div class="footer-section">
+                <h4>Contact</h4>
+                <p>support@careercraftpro.com</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2024 CareerCraft . All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

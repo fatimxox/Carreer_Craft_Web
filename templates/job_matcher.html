@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Matcher - CareerCraft Pro</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="nav-brand">
+                <a href="{{ url_for('land_page') }}" style="text-decoration: none;">
+                    <h1 class="logo">Career<span class="logo-accent">Craft </span></h1>
+                </a>
+            </div>
+
+            <ul class="nav-menu">
+                <li><a href="{{ url_for('cv_services') }}" class="nav-link">CV Services</a></li>
+            </ul>
+
+            <ul class="nav-menu">
+                <li><a href="{{ url_for('job_matcher') }}" class="nav-link">Job Matcher</a></li>
+            </ul>
+
+            <ul class="nav-menu">
+                <li><a href="{{ url_for('interview_preparation') }}" class="nav-link">Interview Prep</a></li>
+            </ul>
+
+            <ul class="nav-menu">
+                <li><a href="{{ url_for('upskilling') }}" class="nav-link">Upskilling</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+                    <span class="theme-icon">🌙</span><span class="theme-icon">☀️</span>
+                </button>
+                <div class="hamburger" onclick="toggleMobileMenu()">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="service-page">
+            <div class="service-sidebar">
+                <button class="back-btn" onclick="showLandingPage()">← Back to Home</button>
+                <h3>Job Tools</h3>
+                <ul class="tab-menu">
+                    <li><a href="#" class="tab-link active" data-tab="matcher">Job Matcher</a></li>
+                    <li><a href="#" class="tab-link" data-tab="email">Email Writer</a></li>
+                </ul>
+            </div>
+    
+            <div class="service-content">
+                <!-- Job Matcher Tab -->
+                <div class="tab-content active" id="matcher">
+                    <div class="content-header">
+                        <h2>Intelligent Job Matcher</h2>
+                        <p>Analyze job compatibility and get a suitability score based on your CV.</p>
+                    </div>
+                    <div class="tool-container">
+                        <div class="input-group">
+                            <label for="matcherJobDescription">Job Description</label>
+                            <textarea id="matcherJobDescription" placeholder="Paste the full job description here..."></textarea>
+                        </div>
+                        <button class="btn-primary" onclick="analyzeMatch()">Analyze Match</button>
+                        <div class="match-results" id="match-results">
+                            <div class="placeholder">Paste a job description and click "Analyze Match".</div>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Email Writing Tab -->
+                <div class="tab-content" id="email">
+                    <div class="content-header">
+                        <h2>Professional Email Writer</h2>
+                        <p>Generate polished application, follow-up, and thank you emails based on your CV.</p>
+                    </div>
+                    <div class="tool-container">
+                        <div class="input-group">
+                            <label for="emailType">Email Type</label>
+                            <select id="emailType">
+                                <option value="application">Job Application Email</option>
+                                <option value="follow_up">Follow-up Email</option>
+                                <option value="thank_you">Thank You Email</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="emailContext">Additional Context</label>
+                            <textarea id="emailContext" placeholder="e.g., Job title: Senior Developer, Company: Tech Solutions, Interviewer: Jane Doe..."></textarea>
+                        </div>
+                        <button class="btn-primary" onclick="generateEmail()">Generate Email</button>
+                        <div class="email-output" id="email-output">
+                            <div class="placeholder">Select an email type, add context, and click "Generate Email".</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
