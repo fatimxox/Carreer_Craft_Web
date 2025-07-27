@@ -371,7 +371,6 @@ function renderRewriteResults(data) {
     `;
 }
 
-// ... (rest of the script.js file remains the same) ...
 
 // Job Matcher
 function analyzeMatch() {

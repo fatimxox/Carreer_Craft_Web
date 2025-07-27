@@ -160,7 +160,6 @@ def generate_email_with_gemini(email_type, context):
     prompt = f"Generate a professional '{email_type}' email based on the provided context. The output must be a valid JSON object with three keys: 'subject' (string), 'email_body' (string, using \\n for new lines), and 'tips' (list of strings for the user). Context: {context}"
     return handle_ai_call(prompt, "generate_email_with_gemini")
 
-# **ENHANCED PROMPT**
 def generate_interview_questions_list(cv_text, job_description=""):
     prompt = f"""
     Act as a senior hiring manager. Generate a balanced set of interview questions based on the provided CV and Job Description.
@@ -179,7 +178,6 @@ def generate_answer_templates_with_gemini(cv_text, question):
     prompt = f"Generate 2-3 diverse answer templates for the interview question below, tailored to the provided CV. Use the STAR method where appropriate. Format as a valid JSON object with a 'question' key (string) and an 'answers' key (list of strings). CV: {cv_text} Question: {question}"
     return handle_ai_call(prompt, "generate_answer_templates_with_gemini")
 
-# **ENHANCED PROMPT**
 def recommend_career_paths_with_gemini(cv_text):
     prompt = f"""
     Analyze this CV and recommend 3 distinct and actionable career paths. For each path, provide specific, modern advice.
@@ -192,7 +190,6 @@ def recommend_career_paths_with_gemini(cv_text):
     """
     return handle_ai_call(prompt, "recommend_career_paths_with_gemini")
 
-# **ENHANCED PROMPT**
 def suggest_projects_with_gemini(cv_text):
     prompt = f"""
     Based on the skills in this CV, suggest 3 modern, impactful project ideas to strengthen it for a job search.
@@ -206,7 +203,6 @@ def suggest_projects_with_gemini(cv_text):
     """
     return handle_ai_call(prompt, "suggest_projects_with_gemini")
 
-# **ENHANCED PROMPT**
 def generate_mini_course_with_gemini(cv_text):
     prompt = f"""
     Analyze the provided CV to identify a potential skill gap for career progression. Generate a personalized mini-course outline to fill that gap.
@@ -220,7 +216,6 @@ def generate_mini_course_with_gemini(cv_text):
     """
     return handle_ai_call(prompt, "generate_mini_course_with_gemini")
 
-# **ENHANCED PROMPT**
 def analyze_interview_answers(interview_history):
     if not interview_history:
         return {'strengths': ["No answers were provided to analyze."], 'weaknesses': [], 'tips': []}
