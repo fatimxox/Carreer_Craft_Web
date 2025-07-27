@@ -1,4 +1,3 @@
-/* --- file: static/script.js --- */
 // =================================================================
 //                 CareerCraft Pro - Main Script
 //
@@ -11,19 +10,35 @@ document.addEventListener('DOMContentLoaded', () => {
     // Global initializations (run on every page)
     initializeTheme();
     initializeNavigation();
+    initializeFAQ(); 
 
     // Page-specific initializations
     initializeFileUpload();
     initializeTabSwitching();
     updateServiceCardState();
-    initializeInterviewListeners(); // New listener setup
+    initializeInterviewListeners(); 
 
     // Activate the first tab on service pages by default
     const firstTabLink = document.querySelector('.service-sidebar .tab-link');
-    if (firstTabLink) {
+    if (firstTabLink && !document.querySelector('.service-sidebar .tab-link.active')) {
         switchTab(firstTabLink.getAttribute('data-tab'));
     }
 });
+
+
+// --- FAQ ACCORDION ---
+function initializeFAQ() {
+    const faqItems = document.querySelectorAll('.faq-item');
+    if (faqItems.length === 0) return;
+
+    faqItems.forEach(item => {
+        const question = item.querySelector('.faq-question');
+        question.addEventListener('click', () => {
+            item.classList.toggle('active');
+        });
+    });
+}
+
 
 // --- THEME MANAGEMENT ---
 function initializeTheme() {
@@ -46,7 +61,7 @@ function setTheme(theme) {
     localStorage.setItem('theme', theme);
     const themeIcons = document.querySelectorAll('.theme-icon');
     if (themeIcons.length > 1) {
-        themeIcons[0].style.display = theme === 'light' ? 'inline' : 'none'; // Moon
+        themeIcons[0].style.display = theme === 'dark' ? 'none' : 'inline'; // Moon
         themeIcons[1].style.display = theme === 'dark' ? 'inline' : 'none';  // Sun
     }
 }
@@ -89,10 +104,9 @@ function scrollToUpload() {
 }
 
 
-// --- LANDING PAGE: FILE UPLOAD ---
+// --- LANDING PAGE: FILE UPLOAD & SERVICE UNLOCKING ---
 function initializeFileUpload() {
     const cvUploadInput = document.getElementById('cvUpload');
-    // This function only runs if the upload box is on the page
     if (!cvUploadInput) return;
 
     const uploadBox = document.getElementById('uploadBox');
@@ -129,7 +143,6 @@ function handleFileUpload(file) {
                 uploadSuccess.style.display = 'block';
             }
             updateServiceCardState();
-            // Scroll to services section after a short delay
             setTimeout(() => {
                 const servicesSection = document.getElementById('services');
                 if (servicesSection) {
@@ -147,24 +160,15 @@ function handleFileUpload(file) {
 }
 
 function updateServiceCardState() {
-    const serviceCards = document.querySelectorAll('.service-card');
-    if (serviceCards.length === 0) return;
+    const serviceButtons = document.querySelectorAll('.service-btn');
+    if (serviceButtons.length === 0) return;
 
     fetch('/check-cv-status')
         .then(response => response.json())
         .then(data => {
             const isCvUploaded = data.cv_uploaded;
-            serviceCards.forEach(card => {
-                const button = card.querySelector('.service-btn');
-                if (isCvUploaded) {
-                    card.style.opacity = '1';
-                    card.style.pointerEvents = 'auto';
-                    if(button) button.disabled = false;
-                } else {
-                    card.style.opacity = '0.6';
-                    card.style.pointerEvents = 'none';
-                    if(button) button.disabled = true;
-                }
+            serviceButtons.forEach(button => {
+                button.disabled = !isCvUploaded;
             });
         });
 }
@@ -173,12 +177,12 @@ function updateServiceCardState() {
 // --- SERVICE PAGES: TAB SWITCHING ---
 function initializeTabSwitching() {
     const tabLinks = document.querySelectorAll('.tab-link');
-    if (tabLinks.length === 0) return; // Only run on service pages
+    if (tabLinks.length === 0) return; 
 
     tabLinks.forEach(link => {
         link.addEventListener('click', e => {
             e.preventDefault();
-            const targetTabId = e.target.closest('a').getAttribute('data-tab');
+            const targetTabId = e.currentTarget.getAttribute('data-tab');
             switchTab(targetTabId);
         });
     });
@@ -188,17 +192,9 @@ function switchTab(tabId) {
     const tabContainer = document.querySelector('.service-content');
     if (!tabContainer || !tabId) return;
 
-    // Hide all tab content
-    tabContainer.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.remove('active');
-    });
+    tabContainer.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    document.querySelectorAll('.tab-link').forEach(link => link.classList.remove('active'));
 
-    // Deactivate all tab links
-    document.querySelectorAll('.tab-link').forEach(link => {
-        link.classList.remove('active');
-    });
-
-    // Show the target tab content and activate its link
     const targetContent = document.getElementById(tabId);
     const targetLink = document.querySelector(`.tab-link[data-tab="${tabId}"]`);
     if (targetContent) targetContent.classList.add('active');
@@ -207,7 +203,6 @@ function switchTab(tabId) {
 
 
 // --- API CALL & RENDERING FUNCTIONS ---
-
 function showLoader(container) {
     container.innerHTML = '<div class="loader"></div>';
 }
@@ -217,14 +212,13 @@ function showErrorInContainer(container, error) {
 }
 
 // CV Services
-function analyzeCV() {
-    const jobDesc = document.getElementById('reviewJobDescription').value;
+function analyzeGeneralReview() {
     const resultsContainer = document.getElementById('review-results');
     showLoader(resultsContainer);
     fetch('/analyze-cv', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ analysis_type: 'review', job_description: jobDesc })
+        body: JSON.stringify({ analysis_type: 'review', job_description: '' })
     })
     .then(response => response.json())
     .then(data => {
@@ -242,11 +236,17 @@ function renderReviewResults(data) {
     const container = document.getElementById('review-results');
     if (!container) return;
     const score = parseInt(data.score, 10) || 0;
-    // Use fallback empty arrays to prevent 'map' of undefined error
     const strengths = data.strengths || [];
     const weaknesses = data.weaknesses || [];
     const recommendations = data.recommendations || [];
     const missingKeywords = data.missing_keywords || [];
+
+    const keywordsHtml = missingKeywords.length > 0 ? `
+        <div class="result-category">
+            <h4><span class="icon">🔍</span> Missing Keywords</h4>
+            <ul>${missingKeywords.map(k => `<li>${k}</li>`).join('')}</ul>
+        </div>
+    ` : '';
 
     container.innerHTML = `
         <div class="score-circle" style="--progress-value: ${score};">
@@ -261,10 +261,7 @@ function renderReviewResults(data) {
                 <h4><span class="icon">🤔</span> Areas for Improvement</h4>
                 <ul>${weaknesses.length > 0 ? weaknesses.map(w => `<li>${w}</li>`).join('') : '<li>No major weaknesses identified.</li>'}</ul>
             </div>
-            <div class="result-category">
-                <h4><span class="icon">🔍</span> Missing Keywords</h4>
-                <ul>${missingKeywords.length > 0 ? missingKeywords.map(k => `<li>${k}</li>`).join('') : '<li>No missing keywords identified. Good match!</li>'}</ul>
-            </div>
+            ${keywordsHtml}
             <div class="result-category">
                 <h4><span class="icon">🚀</span> Actionable Recommendations</h4>
                 <ul>${recommendations.length > 0 ? recommendations.map(r => `<li>${r}</li>`).join('') : '<li>No specific recommendations.</li>'}</ul>
@@ -273,19 +270,34 @@ function renderReviewResults(data) {
     `;
 }
 
-function scanATS() {
+function scanATSAndKeywords() {
+    const jobDesc = document.getElementById('atsJobDescription').value;
+    if (!jobDesc.trim()) {
+        showNotification('Please paste a job description for a keyword match.', 'warning');
+        return;
+    }
     const resultsContainer = document.getElementById('ats-results');
     showLoader(resultsContainer);
-    fetch('/analyze-cv', {
+
+    const atsPromise = fetch('/analyze-cv', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ analysis_type: 'ats', job_description: '' }) // Job description is not needed here
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.error) throw new Error(data.error);
-        renderAtsResults(data);
-        showNotification('ATS Scan complete!', 'success');
+        body: JSON.stringify({ analysis_type: 'ats' })
+    }).then(res => res.json());
+
+    const reviewPromise = fetch('/analyze-cv', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ analysis_type: 'review', job_description: jobDesc })
+    }).then(res => res.json());
+
+    Promise.all([atsPromise, reviewPromise])
+    .then(([atsData, reviewData]) => {
+        if (atsData.error || reviewData.error) {
+            throw new Error(atsData.error || reviewData.error);
+        }
+        renderCombinedATSResults(atsData, reviewData);
+        showNotification('Comprehensive scan complete!', 'success');
     })
     .catch(err => {
         showErrorInContainer(resultsContainer, err);
@@ -293,13 +305,14 @@ function scanATS() {
     });
 }
 
-function renderAtsResults(data) {
+function renderCombinedATSResults(atsData, reviewData) {
     const container = document.getElementById('ats-results');
     if (!container) return;
-    const atsScore = parseInt(data.ats_score, 10) || 0;
-    // Use fallback empty arrays
-    const formatIssues = data.format_issues || [];
-    const improvements = data.improvements || [];
+
+    const atsScore = parseInt(atsData.ats_score, 10) || 0;
+    const formatIssues = atsData.format_issues || [];
+    const improvements = atsData.improvements || [];
+    const missingKeywords = reviewData.missing_keywords || [];
 
     container.innerHTML = `
         <div class="score-circle" style="--progress-value: ${atsScore};">
@@ -307,6 +320,10 @@ function renderAtsResults(data) {
         </div>
         <p class="keyword-score"><strong>Overall ATS Compatibility Score</strong></p>
         <div class="review-details">
+            <div class="result-category">
+                <h4><span class="icon">🔍</span> Missing Keywords from Job Description</h4>
+                <ul>${missingKeywords.length > 0 ? missingKeywords.map(k => `<li>${k}</li>`).join('') : '<li>No missing keywords identified. Good match!</li>'}</ul>
+            </div>
             <div class="result-category">
                 <h4><span class="icon">📄</span> Formatting & Structural Issues</h4>
                 <ul>${formatIssues.length > 0 ? formatIssues.map(i => `<li>${i}</li>`).join('') : '<li>No major formatting issues found. Good job!</li>'}</ul>
@@ -353,6 +370,8 @@ function renderRewriteResults(data) {
         <button class="btn-primary" onclick="downloadContentAsPDF('rewritten-cv-text')">Download as PDF</button>
     `;
 }
+
+// ... (rest of the script.js file remains the same) ...
 
 // Job Matcher
 function analyzeMatch() {
@@ -451,7 +470,6 @@ function initializeInterviewListeners() {
     const responseInput = document.getElementById('responseInput');
     if (responseInput) {
         responseInput.addEventListener('keydown', (event) => {
-            // Send on Enter, but allow Shift+Enter for new lines
             if (event.key === 'Enter' && !event.shiftKey) {
                 event.preventDefault(); 
                 sendResponse();
@@ -467,7 +485,7 @@ function startInterview() {
     
     if(!setupContainer || !chatContainer) return;
     
-    showLoader(setupContainer); // Show loader while waiting for the first question
+    showLoader(setupContainer);
     
     fetch('/start-mock-interview', {
         method: 'POST',
@@ -476,48 +494,54 @@ function startInterview() {
     })
     .then(response => response.json())
     .then(data => {
-        if (!data.success) throw new Error(data.error);
+        if (data.error) throw new Error(data.error);
         
-        setupContainer.style.display = 'none'; // Hide setup
-        chatContainer.style.display = 'flex'; // Show chat
+        setupContainer.style.display = 'none';
+        chatContainer.style.display = 'flex';
         document.getElementById('interviewFeedback').style.display = 'none';
         
         addMessageToChat('interviewer', data.question);
         updateQuestionCounter(data.question_number, data.total_questions);
     })
     .catch(err => {
-        showErrorInContainer(setupContainer, err); // Show error in the setup container
+        setupContainer.innerHTML = `
+           <div class="content-header">
+               <h2>AI Mock Interview</h2>
+               <p>Practice with our AI interviewer and get real-time feedback. Provide an optional job description for tailored questions.</p>
+           </div>
+           <div class="input-group">
+               <label for="mockJobDescription">Job Description (Optional)</label>
+               <textarea id="mockJobDescription" placeholder="Paste a job description for a more relevant interview..."></textarea>
+           </div>
+           <button class="btn-primary" onclick="startInterview()">Start Mock Interview</button>
+        `;
+        showErrorInContainer(setupContainer, err);
         showNotification(`Error: ${err.message}`, 'error')
     });
 }
 
 function sendResponse() {
     const input = document.getElementById('responseInput');
+    const sendButton = document.querySelector('.chat-send');
     const answer = input.value.trim();
     if (!answer) return;
 
     addMessageToChat('user', answer);
     input.value = '';
     input.disabled = true;
-    document.querySelector('.chat-send').disabled = true;
-
+    if(sendButton) sendButton.disabled = true;
 
     fetch('/submit-answer', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ answer: answer })
     })
-    .then(response => {
-        if (!response.ok) {
-            return response.json().then(errorData => {
-                throw new Error(errorData.report_error || errorData.error || 'Server error');
-            });
-        }
-        return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
         input.disabled = false;
-        document.querySelector('.chat-send').disabled = false;
+        if(sendButton) sendButton.disabled = false;
+        input.focus();
+
         if (data.success && data.question) {
             addMessageToChat('interviewer', data.question);
             updateQuestionCounter(data.question_number, data.total_questions);
@@ -525,48 +549,36 @@ function sendResponse() {
             renderInterviewReport(data.report);
             showNotification('Interview complete! Here is your report.', 'success');
         } else {
-            throw new Error(data.error || 'An unexpected response was received.');
+            throw new Error(data.report_error || data.error || 'An unexpected response was received.');
         }
     })
     .catch(err => {
-        renderInterviewReport({
-            strengths: [],
-            weaknesses: [`An error occurred: ${err.message}`],
-            tips: ["Please try starting a new interview. The AI service may be unavailable."]
-        });
+        addMessageToChat('interviewer', `An error occurred: ${err.message}. Please try ending the interview to get a report on your completed questions, or reload to start over.`);
         input.disabled = false;
-        document.querySelector('.chat-send').disabled = false;
+        if(sendButton) sendButton.disabled = false;
     });
 }
 
 function endInterview() {
     const chatContainer = document.getElementById('interviewChat');
     const feedbackContainer = document.getElementById('interviewFeedback');
-    
     if(!chatContainer || !feedbackContainer) return;
 
     chatContainer.style.display = 'none';
     feedbackContainer.style.display = 'block';
-    showLoader(feedbackContainer); // Show loader while fetching the final report
+    showLoader(feedbackContainer);
 
     fetch('/end-mock-interview', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
     })
-    .then(response => {
-        if (!response.ok) {
-            return response.json().then(errorData => {
-                throw new Error(errorData.report_error || errorData.error || 'Server error');
-            });
-        }
-        return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
         if (data.success && data.report) {
             renderInterviewReport(data.report);
             showNotification('Interview ended. Here is your report.', 'success');
         } else {
-            throw new Error(data.error || 'Could not retrieve the interview report.');
+            throw new Error(data.report_error || data.error || 'Could not retrieve the interview report.');
         }
     })
     .catch(err => {
@@ -577,7 +589,6 @@ function endInterview() {
         });
     });
 }
-
 
 function renderInterviewReport(report) {
     const chatContainer = document.getElementById('interviewChat');
@@ -616,12 +627,17 @@ function addMessageToChat(sender, text) {
     if (!chatBox) return;
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${sender}`;
-    // Sanitize text to prevent HTML injection
-    const sanitizedText = text.replace(/</g, "<").replace(/>/g, ">");
+    
+    const contentP = document.createElement('p');
+    contentP.textContent = text; 
+    contentP.innerHTML = contentP.innerHTML.replace(/\n/g, '<br>');
+
     messageDiv.innerHTML = `
         <div class="message-avatar">${sender === 'interviewer' ? '🤖' : '👤'}</div>
-        <div class="message-content"><p>${sanitizedText.replace(/\n/g, '<br>')}</p></div>
+        <div class="message-content"></div>
     `;
+    messageDiv.querySelector('.message-content').appendChild(contentP);
+
     chatBox.appendChild(messageDiv);
     chatBox.scrollTop = chatBox.scrollHeight;
 }
@@ -653,20 +669,15 @@ function loadInterviewQuestions() {
 function renderQuestionList(data) {
     const container = document.getElementById('questions-list');
     if (!container) return;
+    const general = data.General || [];
+    const behavioral = data.Behavioral || [];
+    const technical = data.Technical || [];
+
     container.innerHTML = `
         <div class="review-details">
-            <div class="result-category">
-                <h4><span class="icon">💬</span> General Questions</h4>
-                <ul>${(data.General || []).map(q => `<li>${q}</li>`).join('')}</ul>
-            </div>
-            <div class="result-category">
-                <h4><span class="icon">⭐</span> Behavioral Questions</h4>
-                <ul>${(data.Behavioral || []).map(q => `<li>${q}</li>`).join('')}</ul>
-            </div>
-            <div class="result-category">
-                <h4><span class="icon">💻</span> Technical Questions</h4>
-                <ul>${(data.Technical || []).map(q => `<li>${q}</li>`).join('')}</ul>
-            </div>
+            ${general.length > 0 ? `<div class="result-category"><h4><span class="icon">💬</span> General Questions</h4><ul>${general.map(q => `<li>${q}</li>`).join('')}</ul></div>` : ''}
+            ${behavioral.length > 0 ? `<div class="result-category"><h4><span class="icon">⭐</span> Behavioral Questions</h4><ul>${behavioral.map(q => `<li>${q}</li>`).join('')}</ul></div>` : ''}
+            ${technical.length > 0 ? `<div class="result-category"><h4><span class="icon">💻</span> Technical Questions</h4><ul>${technical.map(q => `<li>${q}</li>`).join('')}</ul></div>` : ''}
         </div>
     `;
 }
@@ -697,10 +708,12 @@ function getAnswerTemplate() {
 function renderAnswerTemplates(data) {
     const container = document.getElementById('template-results');
     if(!container) return;
+    const questionText = document.createElement('span');
+    questionText.textContent = data.question; // Sanitize
     container.innerHTML = `
-        <h4>Answer Templates for: "${data.question}"</h4>
+        <h4>Answer Templates for: "${questionText.innerHTML}"</h4>
         ${(data.answers || []).map((ans, i) => `
-            <div class="template-answer">
+            <div class="result-card">
                 <strong>Template ${i+1}:</strong>
                 <p>${ans.replace(/\n/g, '<br>')}</p>
             </div>
@@ -791,22 +804,18 @@ function renderMiniCourse(data) {
     `;
 }
 
-// --- UTILITY FUNCTIONS ---
 
 function showNotification(message, type = 'info') {
     const notification = document.createElement('div');
-    // Use a class for styling
     notification.className = `notification notification-${type}`;
     notification.textContent = message;
 
     document.body.appendChild(notification);
-    // Trigger animation
     setTimeout(() => { notification.classList.add('show'); }, 10);
 
-    // Remove after duration
     setTimeout(() => {
         notification.classList.remove('show');
-        setTimeout(() => document.body.removeChild(notification), 500);
+        setTimeout(() => { if (notification.parentNode) document.body.removeChild(notification); }, 500);
     }, 4000);
 }
 
@@ -820,18 +829,22 @@ function downloadContentAsPDF(elementId) {
     const filename = 'CareerCraft_Document.pdf';
     showNotification('Generating PDF...', 'info');
 
-    fetch('/download-cv', { // This endpoint works for any text-to-pdf
+    fetch('/download-cv', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cv_content: content })
     })
     .then(response => {
         if (!response.ok) {
-             // Try to get a more specific error message from the response body if possible
-            return response.json().then(err => { throw new Error(err.error || 'PDF generation failed on server.') });
+            return response.json().catch(() => response.text()).then(errorBody => {
+                const errorMessage = errorBody.error || errorBody.message || (typeof errorBody === 'string' && errorBody.substring(0, 100)) || 'Unknown server error';
+                throw new Error(errorMessage);
+            });
         }
         if (response.headers.get("Content-Type") !== "application/pdf") {
-            throw new Error('Server did not return a valid PDF file.');
+            return response.json().then(err => {
+                throw new Error(err.error || 'Server did not return a valid PDF file.');
+            });
         }
         return response.blob();
     })
@@ -846,8 +859,12 @@ function downloadContentAsPDF(elementId) {
         a.remove();
         showNotification('PDF downloaded!', 'success');
     })
-    .catch(err => showNotification(`Download Error: ${err.message}`, 'error'));
+    .catch(err => {
+        showNotification(`Download Error: ${err.message}`, 'error');
+        console.error('Download error:', err);
+    });
 }
+
 
 function copyToClipboard(elementId) {
     const textElement = document.getElementById(elementId);

@@ -3,27 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CareerCraft- Professional Job Application Platform</title>
+    <title>CareerCraft Pro - AI-Powered Career Toolkit</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     
     <header class="header">
-        <nav class="nav">
+        <nav class="nav container">
             <div class="nav-brand">
                 <a href="{{ url_for('land_page') }}" style="text-decoration: none;">
-                    <h1 class="logo">Career<span class="logo-accent">Craft </span></h1>
+                    <h1 class="logo">Career<span class="logo-accent">Craft</span></h1>
                 </a>
             </div>
             <ul class="nav-menu">
                 <li><a href="#home" class="nav-link">Home</a></li>
                 <li><a href="#services" class="nav-link">Services</a></li>
-                <li><a href="#about" class="nav-link">About</a></li>
+                <li><a href="#faq" class="nav-link">FAQ</a></li>
                 <li><a href="#contact" class="nav-link">Contact</a></li>
             </ul>
             <div class="nav-actions">
                 <button class="theme-toggle" aria-label="Toggle theme">
-                    <span class="theme-icon">🌙</span><span class="theme-icon">☀️</span>
+                    <span class="theme-icon">🌙</span><span class="theme-icon" style="display:none;">☀️</span>
                 </button>
                 <div class="hamburger">
                     <span></span><span></span><span></span>
@@ -35,20 +38,47 @@
     <main id="home">
         <!-- Hero Section -->
         <section class="hero">
-            <div id="particle-container"></div>
             <div class="hero-container">
                 <div class="hero-content">
-                    <h1 class="hero-title">Elevate Your Career to <span class="text-gradient">New Heights</span></h1>
-                    <p class="hero-subtitle">Professional CV optimization, interview mastery, and career advancement tools designed for ambitious professionals.</p>
+                    <h1 class="hero-title">Elevate Your Career with <span class="text-gradient">AI Precision</span></h1>
+                    <p class="hero-subtitle">Optimize your CV, ace interviews, and discover your next career move. Our intelligent toolkit is designed for ambitious professionals like you.</p>
                     <div class="hero-cta">
-                        <button class="btn-primary" onclick="scrollToUpload()">Get Started</button>
+                        <button class="btn-primary" onclick="scrollToUpload()">Get Started For Free</button>
                     </div>
                 </div>
                 <div class="hero-visual">
-                    <div class="floating-card">
-                        <div class="card-content">
-                            <div class="success-icon">✓</div>
-                            <p>CV Optimized</p>
+                    <div class="blob-background"></div>
+                    <div class="floating-report-card">
+                        <div class="report-header">
+                           <h5>CV Analysis Report</h5>
+                           <span class="score">88%</span>
+                        </div>
+                        <div class="report-item">
+                            <span class="icon">✅</span>
+                            <div>
+                                <p>Keyword Match</p>
+                                <div class="progress-bar">
+                                    <div style="width: 88%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="report-item">
+                            <span class="icon">📄</span>
+                            <div>
+                                <p>ATS Compatibility</p>
+                                <div class="progress-bar">
+                                    <div style="width: 95%; background-color: var(--success-color);"></div>
+                                </div>
+                            </div>
+                        </div>
+                         <div class="report-item">
+                            <span class="icon">💡</span>
+                            <div>
+                                <p>Actionable Insights</p>
+                                <div class="progress-bar">
+                                    <div style="width: 100%; background-color: var(--secondary-color);"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -58,81 +88,189 @@
         <!-- Upload Section -->
         <section class="upload-section" id="upload">
             <div class="container">
-                <div class="upload-header">
-                    <h2 class="section-title">Upload Your CV to Unlock All Services</h2>
-                    <p class="section-subtitle">Let our AI analyze your profile and provide personalized career guidance.</p>
+                <div class="section-header">
+                    <h2 class="section-title">Unlock Your Potential in 60 Seconds</h2>
+                    <p class="section-subtitle">Upload your CV to activate our full suite of personalized career tools. It's fast, secure, and the first step to your next job.</p>
                 </div>
                 <div class="upload-container">
                     <div class="upload-box" id="uploadBox" onclick="document.getElementById('cvUpload').click()">
-                        <div class="upload-icon">📄</div>
+                        <div class="upload-icon">📤</div>
                         <h3>Drop your CV here or click to browse</h3>
                         <p>Supports PDF, DOCX, TXT (Max 16MB)</p>
                         <input type="file" id="cvUpload" name="cv_file" accept=".pdf,.docx,.txt" hidden onchange="handleFileUpload(this.files[0])">
-                        <button type="button" class="upload-btn">Choose File</button>
+                        <button type="button" class="btn-secondary upload-btn">Choose File</button>
                     </div>
                     <div class="upload-success" id="uploadSuccess" style="display: none;">
                         <div class="success-icon">✓</div>
                         <h3>CV Uploaded Successfully!</h3>
-                        <p>Ready to access all premium services.</p>
+                        <p>You're all set. Scroll down to explore your personalized services.</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Services Section -->
+        <!-- Services Section Redesigned -->
         <section class="services-section" id="services">
             <div class="container">
-                <div class="services-header">
-                    <h2 class="section-title">Premium Career Services</h2>
-                    <p class="section-subtitle">Comprehensive tools to transform your job search.</p>
+                <div class="section-header">
+                    <h2 class="section-title">Your Personal Career Toolkit</h2>
+                    <p class="section-subtitle">Once your CV is uploaded, these powerful AI-driven services become available to you.</p>
                 </div>
-                <div class="services-grid">
-                    <div class="service-card" data-service="cv">
-                        <div class="service-icon">📋</div>
-                        <h3>CV Services</h3>
-                        <p>Professional CV review, ATS optimization, and intelligent rewriting.</p>
-                        <button class="service-btn" onclick="navigateToService('cv')">Access Service</button>
+                <div class="services-showcase">
+                    <!-- Service 1: CV Services -->
+                    <div class="service-feature-row">
+                        <div class="service-feature-text">
+                            <h3>Instant CV Analysis & Rewriting</h3>
+                            <p>Get an in-depth analysis of your CV. We check for ATS compatibility, review it against job descriptions, and use AI to rewrite it for maximum impact, eliminating buzzwords and highlighting your achievements.</p>
+                            <button class="btn-primary service-btn" onclick="navigateToService('cv')" disabled>Optimize My CV</button>
+                        </div>
+                        <div class="service-feature-visual">
+                             <div class="visual-card-mockup cv-mockup-container">
+                                <div class="cv-mockup cv-1"></div>
+                                <div class="cv-mockup cv-2"></div>
+                                <div class="callout callout-keywords">Keywords</div>
+                                <div class="callout callout-skills">Skills</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="service-card" data-service="job-matcher">
-                        <div class="service-icon">🎯</div>
-                        <h3>Job Matcher</h3>
-                        <p>Intelligent job matching and professional email generation.</p>
-                        <button class="service-btn" onclick="navigateToService('job-matcher')">Access Service</button>
+                    <!-- Service 2: Job Matcher -->
+                    <div class="service-feature-row row-reverse">
+                        <div class="service-feature-text">
+                            <h3>Intelligent Job Matching</h3>
+                            <p>Stop guessing if you're a good fit. Paste any job description to see a detailed match score, a gap analysis of your skills, and specific recommendations to bridge the gap. Then, generate a professional application email in seconds.</p>
+                            <button class="btn-primary service-btn" onclick="navigateToService('job-matcher')" disabled>Match a Job</button>
+                        </div>
+                        <div class="service-feature-visual">
+                            <div class="visual-card-mockup job-match-visual">
+                                <h4>Job Match Report</h4>
+                                <div class="match-columns">
+                                    <div class="match-column">
+                                        <h5>✅ Matched Skills</h5>
+                                        <ul><li>Python</li><li>REST APIs</li><li>SQL</li><li>Docker</li></ul>
+                                    </div>
+                                    <div class="match-column">
+                                        <h5>❌ Missing Requirements</h5>
+                                        <ul><li>Go</li><li>Terraform</li><li>Kubernetes</li></ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="service-card" data-service="interview">
-                        <div class="service-icon">💬</div>
-                        <h3>Interview Prep</h3>
-                        <p>AI-powered mock interviews and personalized feedback.</p>
-                        <button class="service-btn" onclick="navigateToService('interview')">Access Service</button>
+                    <!-- Service 3: Interview Prep -->
+                    <div class="service-feature-row">
+                        <div class="service-feature-text">
+                            <h3>AI-Powered Interview Practice</h3>
+                            <p>Build confidence by simulating real interviews with our AI. Get questions tailored to your CV and the job you want, practice your answers, and receive instant, constructive feedback to help you ace the real thing.</p>
+                            <button class="btn-primary service-btn" onclick="navigateToService('interview')" disabled>Start a Mock Interview</button>
+                        </div>
+                        <div class="service-feature-visual">
+                            <div class="visual-card-mockup chat-mockup-window">
+                                <div class="mockup-header"><span></span><span></span><span></span></div>
+                                <div class="chat-body">
+                                    <div class="chat-bubble ai">Tell me about a time you handled a tight deadline.</div>
+                                    <div class="chat-bubble user">In my previous role, we had a critical project...</div>
+                                    <div class="chat-feedback">💡 Feedback: Great use of the STAR method!</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="service-card" data-service="upskilling">
-                        <div class="service-icon">📚</div>
-                        <h3>Upskilling</h3>
-                        <p>Personalized learning paths and skill development resources.</p>
-                        <button class="service-btn" onclick="navigateToService('upskilling')">Access Service</button>
+                    <!-- Service 4: Upskilling -->
+                    <div class="service-feature-row row-reverse">
+                        <div class="service-feature-text">
+                            <h3>Personalized Career Growth</h3>
+                            <p>Look beyond your next job. Discover potential career paths based on your skills, get project ideas to build your portfolio, and generate custom mini-course outlines to guide your professional development journey.</p>
+                            <button class="btn-primary service-btn" onclick="navigateToService('upskilling')" disabled>Plan My Growth</button>
+                        </div>
+                        <div class="service-feature-visual">
+                            <div class="visual-card-mockup growth-path-visual">
+                                <div class="path-item current">
+                                    <h5>Your Current Role</h5>
+                                    <p>Software Developer</p>
+                                </div>
+                                <div class="path-line"></div>
+                                <div class="path-item next">
+                                    <span class="path-icon">🚀</span>
+                                    <h5>Recommended Next Step</h5>
+                                    <p>Product Manager</p>
+                                </div>
+                                <div class="path-skills">
+                                    <h6>Skills to Learn:</h6>
+                                    <span>Market Research</span>
+                                    <span>User Journey Mapping</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
+
+        <!-- FAQ Section -->
+        <section class="faq-section" id="faq">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Frequently Asked Questions</h2>
+                </div>
+                <div class="faq-container">
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            What is CareerCraft Pro?
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>CareerCraft Pro is an AI-powered platform designed to help professionals enhance their job application materials and prepare for interviews. It uses advanced AI to analyze your CV, match it to jobs, simulate interviews, and suggest career growth paths, all based on your unique profile.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            How does the ATS Scanner work?
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Our ATS (Applicant Tracking System) Scanner focuses on the technical aspects of your CV. It checks for common issues that cause automated systems to misread or reject a resume, such as incompatible fonts, complex layouts, images, or incorrect section headers. It ensures your document is machine-readable so a human recruiter can see it.</p>
+                        </div>
+                    </div>
+                     <div class="faq-item">
+                        <button class="faq-question">
+                            Do I need to upload a new CV for every feature?
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>No. You only need to upload your CV once to unlock all the services. Our platform securely uses your CV text for your session, allowing you to seamlessly use the Job Matcher, Interview Prep, and other tools without re-uploading. Your data is automatically deleted after a period of inactivity for your privacy.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            Is my data and CV secure?
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Yes, your privacy and data security are our top priorities. Your uploaded file is processed to extract the text and then immediately deleted from our server. The extracted text is stored temporarily and securely for your active session and is automatically purged from our database after a short period (typically 24 hours) to protect your information.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <footer class="footer" id="contact">
-        <div class="footer-content">
+        <div class="footer-content container">
             <div class="footer-section" id="about">
-                <h3>About CareerCraft </h3>
-                <p>Empowering professionals to achieve their career aspirations with AI-driven tools.</p>
+                <h3>About CareerCraft Pro</h3>
+                <p>We are dedicated to empowering professionals by providing accessible, AI-driven tools to navigate the complexities of the modern job market.</p>
             </div>
             <div class="footer-section">
                 <h4>Developers</h4>
-                <p> OMAR & FATMA </p>
+                <p>OMAR & FATMA</p>
             </div>
             <div class="footer-section">
                 <h4>Contact</h4>
                 <p>support@careercraftpro.com</p>
             </div>
         </div>
-        <div class="footer-bottom">
-            <p>© 2024 CareerCraft . All rights reserved.</p>
+        <div class="footer-bottom container">
+            <p>© 2024 CareerCraft Pro. All rights reserved.</p>
         </div>
     </footer>
 

@@ -4,36 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CV Services - CareerCraft Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <header class="header">
-        <nav class="nav">
+        <nav class="nav container">
             <div class="nav-brand">
                 <a href="{{ url_for('land_page') }}" style="text-decoration: none;">
-                    <h1 class="logo">Career<span class="logo-accent">Craft </span></h1>
+                    <h1 class="logo">Career<span class="logo-accent">Craft</span></h1>
                 </a>
             </div>
-
             <ul class="nav-menu">
-                <li><a href="{{ url_for('cv_services') }}" class="nav-link">CV Services</a></li>
-            </ul>
-
-            <ul class="nav-menu">
+                <li><a href="{{ url_for('cv_services') }}" class="nav-link active">CV Services</a></li>
                 <li><a href="{{ url_for('job_matcher') }}" class="nav-link">Job Matcher</a></li>
-            </ul>
-
-            <ul class="nav-menu">
                 <li><a href="{{ url_for('interview_preparation') }}" class="nav-link">Interview Prep</a></li>
-            </ul>
-
-            <ul class="nav-menu">
                 <li><a href="{{ url_for('upskilling') }}" class="nav-link">Upskilling</a></li>
             </ul>
-
             <div class="nav-actions">
                 <button class="theme-toggle" aria-label="Toggle theme">
-                    <span class="theme-icon">🌙</span><span class="theme-icon">☀️</span>
+                    <span class="theme-icon">🌙</span><span class="theme-icon" style="display:none;">☀️</span>
                 </button>
                 <div class="hamburger">
                     <span></span><span></span><span></span>
@@ -48,57 +40,41 @@
                 <button class="back-btn" onclick="showLandingPage()">← Back to Home</button>
                 <h3>CV Services</h3>
                 <ul class="tab-menu">
-                    <li><a href="#" class="tab-link active" data-tab="ats">ATS Scanner</a></li>
+                    <li><a href="#" class="tab-link active" data-tab="ats">ATS & Keyword Match</a></li>
                     <li><a href="#" class="tab-link" data-tab="review">CV Review</a></li>
                     <li><a href="#" class="tab-link" data-tab="rewriter">CV Rewriter</a></li>
                 </ul>
             </div>
     
             <div class="service-content">
-                <!-- ATS Scanner Tab -->
-<<<<<<< HEAD
+                <!-- ATS & Keyword Match Tab -->
                 <div class="tab-content active" id="ats">
-=======
-                <div class="tab-content active" id="review">
                     <div class="content-header">
-                        <h2>ATS Scanner</h2>
-                        <p>Check if your CV passes Applicant Tracking System filters.</p>
-
-                        <button class="btn-primary" onclick="analyzeCV()"> Scan for ATS   </button>
-                    </div>
-                    <div class="results-panel" id="review-results">
-                        <div class="placeholder">Click "Scan for ATS" to see your results.</div>
-                    </div>
-                </div> 
-                <!-- CV Review Tab -->
-                <div class="tab-content" id="ats">
->>>>>>> f40f654bf2da5d662ffacf7bc50b80363e45413a
-                    <div class="content-header">
-                        <h2>ATS Compatibility Scanner</h2>
-                        <p>See how well your CV can be parsed by automated systems. This scan checks for formatting and structural issues, not job-specific content.</p>
+                        <h2>ATS & Keyword Match</h2>
+                        <p>Check if your CV is machine-readable and aligns with a specific job. We'll scan for formatting issues and check for crucial keywords from the job description.</p>
                     </div>
                     <div class="tool-container">
-                        <button class="btn-primary" onclick="scanATS()">Run ATS Compatibility Scan</button>
+                        <div class="input-group">
+                            <label for="atsJobDescription">Job Description</label>
+                            <textarea id="atsJobDescription" placeholder="For a targeted keyword analysis, paste the full job description here..."></textarea>
+                        </div>
+                        <button class="btn-primary" onclick="scanATSAndKeywords()">Run Comprehensive Scan</button>
                         <div class="ats-results" id="ats-results">
-                            <div class="placeholder">Click the button to scan your CV for ATS compatibility.</div>
+                            <div class="placeholder">Paste a job description and click the button to scan your CV.</div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- CV Review Tab -->
+                <!-- General CV Review Tab -->
                 <div class="tab-content" id="review">
                     <div class="content-header">
-                        <h2>Professional CV Review</h2>
-                        <p>Get expert feedback on your CV, with detailed analysis, keyword matching, and improvement suggestions.</p>
+                        <h2>In-depth CV Review</h2>
+                        <p>Get a detailed analysis of your CV's content. We'll identify general strengths, weaknesses, and areas for improvement without targeting a specific job.</p>
                     </div>
                     <div class="tool-container">
-                         <div class="input-group">
-                            <label for="reviewJobDescription">Job Description (Optional, but recommended)</label>
-                            <textarea id="reviewJobDescription" placeholder="For a more targeted review and keyword analysis, paste the job description here..."></textarea>
-                        </div>
-                        <button class="btn-primary" onclick="analyzeCV()">Analyze My CV</button>
+                        <button class="btn-primary" onclick="analyzeGeneralReview()">Analyze My CV</button>
                         <div class="results-panel" id="review-results">
-                            <div class="placeholder">Click "Analyze My CV" to see your results.</div>
+                            <div class="placeholder">Click "Analyze My CV" to get a general review.</div>
                         </div>
                     </div>
                 </div>
@@ -106,8 +82,8 @@
                 <!-- CV Rewriter Tab -->
                 <div class="tab-content" id="rewriter">
                     <div class="content-header">
-                        <h2>CV Rewriter</h2>
-                        <p>Let our AI enhance and optimize your CV content to be more impactful.</p>
+                        <h2>AI CV Rewriter</h2>
+                        <p>Let our AI enhance and optimize your CV content. We'll improve phrasing, highlight achievements, and ensure it's impactful and professional.</p>
                     </div>
                      <div class="tool-container">
                         <button class="btn-primary" onclick="rewriteCV()">Rewrite My CV</button>

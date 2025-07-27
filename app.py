@@ -5,6 +5,7 @@ import logging
 import uuid
 from io import BytesIO
 from datetime import datetime, timedelta, UTC
+from html import escape
 
 # --- Core Flask and Dependencies ---
 from flask import Flask, render_template, request, jsonify, session, send_file
@@ -14,9 +15,7 @@ from werkzeug.utils import secure_filename
 # --- Document Processing ---
 import PyPDF2
 import docx
-import pdfkit
-from docx import Document
-from docx.shared import Pt
+import pdfkit # Requires wkhtmltopdf to be installed on the system
 
 # --- AI Integration ---
 import google.generativeai as genai
@@ -29,26 +28,19 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your-secret-key-change-this')
+app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your-secret-key-for-production')
 app.config['SESSION_TYPE'] = 'filesystem'
-
-# Configure Gemini API
-
-
-# --- File Upload Configuration ---
 app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-
-# --- Database Configuration ---
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///site.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 # --- Gemini API Configuration ---
-# IMPORTANT: The application's AI features will NOT work without this key set in your environment.
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', 'AIzaSyAYkR5arVG7lIGAd-Dl219gm6B-zXAgg9A')  # Replace with your actual API key
-AI_FEATURES_ENABLED = bool(GEMINI_API_KEY)
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', 'AIzaSyAYkR5arVG7lIGAd-Dl219gm6B-zXAgg9A')
+AI_FEATURES_ENABLED = bool(GEMINI_API_KEY) and GEMINI_API_KEY != 'YOUR_API_KEY_HERE'
+
 if AI_FEATURES_ENABLED:
     try:
         genai.configure(api_key=GEMINI_API_KEY)
@@ -60,12 +52,11 @@ if AI_FEATURES_ENABLED:
         logger.error(f"Failed to configure Gemini AI. Features DISABLED. Error: {e}")
 else:
     model = None
-    logger.warning("AI Features are DISABLED. No Gemini API key found in environment variables.")
+    logger.warning("AI Features are DISABLED. No valid Gemini API key found.")
 
 # ==============================================================================
 # 2. DATABASE MODELS
 # ==============================================================================
-
 class CVData(db.Model):
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     cv_text = db.Column(db.Text, nullable=False)
@@ -82,7 +73,6 @@ class MockInterviewSession(db.Model):
 # ==============================================================================
 # 3. HELPER FUNCTIONS
 # ==============================================================================
-
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'pdf', 'docx', 'txt'}
 
@@ -110,10 +100,7 @@ def get_cv_text_from_db():
     cv_id = session.get('cv_id')
     if not cv_id: return None
     cv_data = db.session.get(CVData, cv_id)
-    if not cv_data:
-        session.pop('cv_id', None)
-        return None
-    return cv_data.cv_text
+    return cv_data.cv_text if cv_data else None
 
 def get_interview_session_data(timeout_hours=4):
     session_id = session.get('interview_session_id')
@@ -123,7 +110,6 @@ def get_interview_session_data(timeout_hours=4):
         session.pop('interview_session_id', None)
         return None
     
-    # FIX: Make the naive datetime from the DB "aware" by setting its timezone to UTC.
     session_start_time_aware = interview_session.start_time.replace(tzinfo=UTC)
 
     if session_start_time_aware < (datetime.now(UTC) - timedelta(hours=timeout_hours)):
@@ -144,9 +130,8 @@ def clean_api_response(response_text):
     return re.sub(r'^```json\n|\n```$', '', response_text, flags=re.MULTILINE).strip()
 
 # ==============================================================================
-# 4. AI-POWERED GENERATION FUNCTIONS
+# 4. AI-POWERED GENERATION FUNCTIONS (WITH ENHANCED PROMPTS)
 # ==============================================================================
-
 def handle_ai_call(prompt, function_name):
     if not AI_FEATURES_ENABLED:
         return {"error": "AI features are currently unavailable. The server's API key may be missing."}
@@ -157,7 +142,7 @@ def handle_ai_call(prompt, function_name):
         return json.loads(clean_api_response(response.text))
     except (json.JSONDecodeError, ValueError) as e:
         logger.error(f"AI JSON Parsing Error in {function_name}: {e}. Raw response: '{getattr(response, 'text', 'N/A')}'")
-        return {"error": f"Failed to parse AI response. Details: {e}", "raw_response": getattr(response, 'text', '')}
+        return {"error": f"Failed to parse AI response. Please try again. Details: {e}", "raw_response": getattr(response, 'text', '')}
     except Exception as e:
         logger.error(f"AI General Error in {function_name}: {e}")
         return {"error": f"An unexpected error occurred with the AI service: {e}", "raw_response": getattr(e, 'message', '')}
@@ -175,61 +160,156 @@ def generate_email_with_gemini(email_type, context):
     prompt = f"Generate a professional '{email_type}' email based on the provided context. The output must be a valid JSON object with three keys: 'subject' (string), 'email_body' (string, using \\n for new lines), and 'tips' (list of strings for the user). Context: {context}"
     return handle_ai_call(prompt, "generate_email_with_gemini")
 
+# **ENHANCED PROMPT**
 def generate_interview_questions_list(cv_text, job_description=""):
-    prompt = f"Generate interview questions based on the CV and Job Description. Provide 3-5 questions for each category: General, Technical, and Behavioral. Format as a valid JSON object with 'General', 'Technical', and 'Behavioral' as keys, each containing a list of strings. CV: {cv_text} Job Description: {job_description}"
+    prompt = f"""
+    Act as a senior hiring manager. Generate a balanced set of interview questions based on the provided CV and Job Description.
+    Your goal is to create a realistic interview simulation.
+    - Prioritize questions that merge the candidate's experience (from the CV) with the specific requirements and responsibilities of the Job Description.
+    - Create scenario-based behavioral questions relevant to the role.
+    - Create technical questions directly related to the skills listed in the job description.
+    - Include 1-2 general/ice-breaker questions.
+    Format the output as a valid JSON object with 'General', 'Technical', and 'Behavioral' as keys, each containing a list of 3-4 string questions.
+    CV: {cv_text}
+    Job Description: {job_description}
+    """
     return handle_ai_call(prompt, "generate_interview_questions_list")
 
 def generate_answer_templates_with_gemini(cv_text, question):
     prompt = f"Generate 2-3 diverse answer templates for the interview question below, tailored to the provided CV. Use the STAR method where appropriate. Format as a valid JSON object with a 'question' key (string) and an 'answers' key (list of strings). CV: {cv_text} Question: {question}"
     return handle_ai_call(prompt, "generate_answer_templates_with_gemini")
 
+# **ENHANCED PROMPT**
 def recommend_career_paths_with_gemini(cv_text):
-    prompt = f"Analyze this CV and recommend 3 distinct career paths. For each path, describe required skills and actionable transition steps. Format as a valid JSON object with a 'career_paths' key, which is a list of objects. Each object must have 'path', 'required_skills' (list), and 'transition_steps' (list). CV: {cv_text}"
+    prompt = f"""
+    Analyze this CV and recommend 3 distinct and actionable career paths. For each path, provide specific, modern advice.
+    Format as a valid JSON object with a 'career_paths' key, which is a list of objects.
+    Each object must have:
+    - 'path': The job title/career path (e.g., "Product Manager", "DevOps Engineer").
+    - 'required_skills': A list of 3-5 crucial skills needed for this role that may be a stretch from the current CV.
+    - 'transition_steps': A list of concrete, actionable steps to take (e.g., "Complete the Google Project Management Certificate on Coursera", "Build a portfolio project using AWS Lambda and S3 to demonstrate serverless skills").
+    CV: {cv_text}
+    """
     return handle_ai_call(prompt, "recommend_career_paths_with_gemini")
 
+# **ENHANCED PROMPT**
 def suggest_projects_with_gemini(cv_text):
-    prompt = f"Based on the skills in this CV, suggest 3 impactful project ideas to strengthen it. Format as a valid JSON object with a 'projects' key, containing a list of objects. Each object must have 'idea', 'skills_developed' (list), and 'estimated_time'. CV: {cv_text}"
+    prompt = f"""
+    Based on the skills in this CV, suggest 3 modern, impactful project ideas to strengthen it for a job search.
+    Format as a valid JSON object with a 'projects' key, containing a list of objects.
+    Each object must have:
+    - 'idea': A clear, concise project idea (e.g., "Full-Stack E-commerce API").
+    - 'skills_developed': A list of specific, in-demand skills this project will develop (e.g., "REST API Design", "User Authentication with JWT", "Database Schema Design").
+    - 'estimated_time': A realistic time estimate (e.g., "40-60 hours").
+    Make the projects relevant to potential career growth based on the CV.
+    CV: {cv_text}
+    """
     return handle_ai_call(prompt, "suggest_projects_with_gemini")
 
+# **ENHANCED PROMPT**
 def generate_mini_course_with_gemini(cv_text):
-    prompt = f"Generate a personalized mini-course outline to fill a potential skill gap from this CV. Format as a valid JSON object with keys: 'title', 'description', 'objectives' (list), and 'modules' (list). CV: {cv_text}"
+    prompt = f"""
+    Analyze the provided CV to identify a potential skill gap for career progression. Generate a personalized mini-course outline to fill that gap.
+    The course should be practical and project-oriented.
+    Format as a valid JSON object with keys:
+    - 'title': A compelling course title (e.g., "From Developer to DevOps: A Practical Introduction").
+    - 'description': A brief, motivating paragraph about the course.
+    - 'objectives': A list of 3-4 clear learning objectives.
+    - 'modules': A list of 4-5 module titles that represent a logical learning flow (e.g., "Module 1: CI/CD with GitHub Actions", "Module 2: Infrastructure as Code with Terraform").
+    CV: {cv_text}
+    """
     return handle_ai_call(prompt, "generate_mini_course_with_gemini")
 
+# **ENHANCED PROMPT**
 def analyze_interview_answers(interview_history):
     if not interview_history:
-        return {'strengths': [], 'weaknesses': [], 'tips': ['No answers were provided to analyze.']}
+        return {'strengths': ["No answers were provided to analyze."], 'weaknesses': [], 'tips': []}
     formatted_history = "\n".join([f"Q: {item['question']}\nA: {item['answer']}" for item in interview_history])
-    prompt = f"Analyze the following interview transcript and provide a constructive performance review. Format as a JSON object with 'strengths' (list), 'weaknesses' (list), and 'tips' (list) keys. Transcript: {formatted_history}"
+    prompt = f"""
+    Analyze the following interview transcript and provide a constructive performance review.
+    Crucially, you *must* identify at least one 'strength'. If the answers are poor, find a positive aspect like "Good effort to structure the answer" or "Polite and professional tone". Do not leave the strengths list empty.
+    For 'weaknesses', be specific and constructive.
+    For 'tips', provide highly actionable advice.
+    Format as a JSON object with 'strengths' (list of strings), 'weaknesses' (list of strings), and 'tips' (list of strings) keys.
+    Transcript: {formatted_history}
+    """
     return handle_ai_call(prompt, "analyze_interview_answers")
 
 # ==============================================================================
-# 5. PDF GENERATION
+# 5. PDF GENERATION (WITH ENHANCED "LATEX" STYLE)
 # ==============================================================================
-
-# IMPORTANT NOTE: PDF generation requires the 'wkhtmltopdf' utility to be installed on the system
-# and accessible in the system's PATH. If it's not installed, this function will fail.
-# See: https://wkhtmltopdf.org/downloads.html
 def generate_ats_pdf(text_content: str) -> BytesIO:
+    safe_content = escape(text_content).replace('\n', '<br>')
+    
     html_template = f"""
-    <html><head><style>
-        body {{ font-family: Arial, sans-serif; font-size: 11pt; line-height: 1.4; white-space: pre-wrap; }}
-    </style></head><body>{text_content}</body></html>"""
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>CareerCraft Pro Document</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+        <style>
+            body {{
+                font-family: 'EB Garamond', serif;
+                font-size: 12pt;
+                line-height: 1.6;
+                color: #212121;
+                margin: 2cm;
+            }}
+            pre {{
+                font-family: 'EB Garamond', serif;
+                white-space: pre-wrap;
+                word-wrap: break-word;
+                background-color: transparent;
+                border: none;
+                padding: 0;
+                margin: 0;
+                font-size: 12pt;
+            }}
+            h1, h2, h3, h4, strong {{
+                font-family: 'Lato', sans-serif;
+                font-weight: 700;
+                color: #000;
+            }}
+            h4, strong {{
+                 margin-top: 1em;
+                 margin-bottom: 0.2em;
+                 display: block;
+                 font-size: 13pt;
+                 border-bottom: 1px solid #ccc;
+                 padding-bottom: 3px;
+            }}
+        </style>
+    </head>
+    <body>
+        <h1>CareerCraft Pro Generated Document</h1>
+        <pre>{safe_content}</pre>
+    </body>
+    </html>
+    """
     try:
-        # The 'False' argument tells pdfkit to return the PDF as a byte string
-        pdf = pdfkit.from_string(html_template, False)
+        # Options to ensure better rendering
+        options = {
+            'page-size': 'A4',
+            'margin-top': '20mm',
+            'margin-right': '20mm',
+            'margin-bottom': '20mm',
+            'margin-left': '20mm',
+            'encoding': "UTF-8"
+        }
+        pdf = pdfkit.from_string(html_template, False, options=options)
         return BytesIO(pdf)
     except OSError as e:
-        # This error block is triggered if wkhtmltopdf is not found.
         logger.error(f"pdfkit PDF generation failed: {e}. Check that wkhtmltopdf is installed and in your system's PATH.")
         error_html = f"<html><body><h1>PDF Generation Failed</h1><p>Error: {e}</p><p>This feature requires the 'wkhtmltopdf' command-line tool. Please ensure it is installed and accessible via the system's PATH.</p></body></html>"
-        # Return a PDF containing the error message.
         error_pdf = pdfkit.from_string(error_html, False)
         return BytesIO(error_pdf)
 
 # ==============================================================================
 # 6. PAGE-RENDERING ROUTES
 # ==============================================================================
-
 @app.route('/')
 def land_page():
     return render_template('land_page.html')
@@ -249,11 +329,10 @@ def interview_preparation():
 @app.route('/upskilling')
 def upskilling():
     return render_template('upskilling.html')
-
+    
 # ==============================================================================
 # 7. API ENDPOINTS
 # ==============================================================================
-
 @app.route('/upload-cv', methods=['POST'])
 def upload_cv():
     if 'cv_file' not in request.files:
@@ -262,8 +341,8 @@ def upload_cv():
     if file.filename == '' or not allowed_file(file.filename):
         return jsonify({'error': 'Invalid or no file selected'}), 400
 
-    filename = secure_filename(file.filename)
-    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    unique_filename = f"{uuid.uuid4()}_{secure_filename(file.filename)}"
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
     try:
         file.save(file_path)
         cv_text = extract_text_from_file(file_path)
@@ -291,38 +370,31 @@ def check_cv_status():
     cv_uploaded = get_cv_text_from_db() is not None
     return jsonify({'cv_uploaded': cv_uploaded, 'ai_enabled': AI_FEATURES_ENABLED})
 
-# --- CV Services & Job Matcher ---
 @app.route('/analyze-cv', methods=['POST'])
 def analyze_cv_api():
     cv_text = get_cv_text_from_db()
     if not cv_text: return jsonify({'error': 'CV not found. Please upload it first.'}), 400
-    
     req_data = request.json
     analysis_type = req_data.get('analysis_type')
     job_description = req_data.get('job_description', '')
-    
     if not analysis_type: return jsonify({'error': 'Analysis type not specified.'}), 400
     
     result = analyze_cv_with_gemini(cv_text, analysis_type, job_description)
-    if 'error' in result:
-        return jsonify(result), 500
+    if 'error' in result: return jsonify(result), 500
     return jsonify(result)
 
 @app.route('/generate-email', methods=['POST'])
 def generate_email_api():
     cv_text = get_cv_text_from_db()
     if not cv_text: return jsonify({'error': 'CV not found. Please upload it first.'}), 400
-    
     req_data = request.json
     email_type = req_data.get('email_type')
     context = req_data.get('context', '')
-    
     if not email_type: return jsonify({'error': 'Email type not specified.'}), 400
     
     full_context = f"CV Text: {cv_text}\nAdditional Info: {context}"
     result = generate_email_with_gemini(email_type, full_context)
-    if 'error' in result:
-        return jsonify(result), 500
+    if 'error' in result: return jsonify(result), 500
     return jsonify(result)
 
 @app.route('/download-cv', methods=['POST'])
@@ -330,12 +402,15 @@ def download_cv_as_pdf():
     content = request.json.get('cv_content')
     if not content: return jsonify({'error': 'No content provided'}), 400
     
-    pdf_buffer = generate_ats_pdf(content)
-    pdf_buffer.seek(0)
-    
-    return send_file(pdf_buffer, as_attachment=True, download_name='generated_document.pdf', mimetype='application/pdf')
+    try:
+        pdf_buffer = generate_ats_pdf(content)
+        pdf_buffer.seek(0)
+        return send_file(pdf_buffer, as_attachment=True, download_name='CareerCraft_Document.pdf', mimetype='application/pdf')
+    except Exception as e:
+        # This catches errors from pdfkit if it's not installed, etc.
+        logger.error(f"PDF generation route failed: {e}")
+        return jsonify({'error': str(e)}), 500
 
-# --- Interview Prep ---
 @app.route('/start-mock-interview', methods=['POST'])
 def start_mock_interview():
     cv_text = get_cv_text_from_db()
@@ -422,7 +497,6 @@ def answer_template_api():
     if 'error' in result: return jsonify(result), 500
     return jsonify(result)
 
-# --- Upskilling ---
 @app.route('/career-paths', methods=['POST'])
 def career_paths_api():
     cv_text = get_cv_text_from_db()
@@ -450,7 +524,6 @@ def mini_course_api():
 # ==============================================================================
 # 8. APP INITIALIZATION & CLEANUP
 # ==============================================================================
-
 def cleanup_old_data(cv_days_old=1, interview_hours_old=4):
     with app.app_context():
         try:

@@ -4,36 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Job Matcher - CareerCraft Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <header class="header">
-        <nav class="nav">
+        <nav class="nav container">
             <div class="nav-brand">
                 <a href="{{ url_for('land_page') }}" style="text-decoration: none;">
-                    <h1 class="logo">Career<span class="logo-accent">Craft </span></h1>
+                    <h1 class="logo">Career<span class="logo-accent">Craft</span></h1>
                 </a>
             </div>
-
             <ul class="nav-menu">
                 <li><a href="{{ url_for('cv_services') }}" class="nav-link">CV Services</a></li>
-            </ul>
-
-            <ul class="nav-menu">
-                <li><a href="{{ url_for('job_matcher') }}" class="nav-link">Job Matcher</a></li>
-            </ul>
-
-            <ul class="nav-menu">
+                <li><a href="{{ url_for('job_matcher') }}" class="nav-link active">Job Matcher</a></li>
                 <li><a href="{{ url_for('interview_preparation') }}" class="nav-link">Interview Prep</a></li>
-            </ul>
-
-            <ul class="nav-menu">
                 <li><a href="{{ url_for('upskilling') }}" class="nav-link">Upskilling</a></li>
             </ul>
-
             <div class="nav-actions">
                 <button class="theme-toggle" aria-label="Toggle theme">
-                    <span class="theme-icon">🌙</span><span class="theme-icon">☀️</span>
+                    <span class="theme-icon">🌙</span><span class="theme-icon" style="display:none;">☀️</span>
                 </button>
                 <div class="hamburger">
                     <span></span><span></span><span></span>
@@ -58,7 +50,7 @@
                 <div class="tab-content active" id="matcher">
                     <div class="content-header">
                         <h2>Intelligent Job Matcher</h2>
-                        <p>Analyze job compatibility and get a suitability score based on your CV.</p>
+                        <p>Analyze how well your CV aligns with a job description and get a detailed suitability score, gap analysis, and recommendations.</p>
                     </div>
                     <div class="tool-container">
                         <div class="input-group">
@@ -76,7 +68,7 @@
                 <div class="tab-content" id="email">
                     <div class="content-header">
                         <h2>Professional Email Writer</h2>
-                        <p>Generate polished application, follow-up, and thank you emails based on your CV.</p>
+                        <p>Generate polished application, follow-up, and thank you emails in seconds, tailored with information from your CV.</p>
                     </div>
                     <div class="tool-container">
                         <div class="input-group">
@@ -88,7 +80,7 @@
                             </select>
                         </div>
                         <div class="input-group">
-                            <label for="emailContext">Additional Context</label>
+                            <label for="emailContext">Additional Context (Optional)</label>
                             <textarea id="emailContext" placeholder="e.g., Job title: Senior Developer, Company: Tech Solutions, Interviewer: Jane Doe..."></textarea>
                         </div>
                         <button class="btn-primary" onclick="generateEmail()">Generate Email</button>

@@ -1,39 +1,32 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interview Preparation - CareerCraft Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <header class="header">
-        <nav class="nav">
+        <nav class="nav container">
             <div class="nav-brand">
                 <a href="{{ url_for('land_page') }}" style="text-decoration: none;">
-                    <h1 class="logo">Career<span class="logo-accent">Craft </span></h1>
+                    <h1 class="logo">Career<span class="logo-accent">Craft</span></h1>
                 </a>
             </div>
-
             <ul class="nav-menu">
                 <li><a href="{{ url_for('cv_services') }}" class="nav-link">CV Services</a></li>
-            </ul>
-
-            <ul class="nav-menu">
                 <li><a href="{{ url_for('job_matcher') }}" class="nav-link">Job Matcher</a></li>
-            </ul>
-
-            <ul class="nav-menu">
-                <li><a href="{{ url_for('interview_preparation') }}" class="nav-link">Interview Prep</a></li>
-            </ul>
-
-            <ul class="nav-menu">
+                <li><a href="{{ url_for('interview_preparation') }}" class="nav-link active">Interview Prep</a></li>
                 <li><a href="{{ url_for('upskilling') }}" class="nav-link">Upskilling</a></li>
             </ul>
-
             <div class="nav-actions">
                 <button class="theme-toggle" aria-label="Toggle theme">
-                    <span class="theme-icon">🌙</span><span class="theme-icon">☀️</span>
+                    <span class="theme-icon">🌙</span><span class="theme-icon" style="display:none;">☀️</span>
                 </button>
                 <div class="hamburger">
                     <span></span><span></span><span></span>
@@ -75,11 +68,11 @@
                                <h4>AI Interviewer</h4>
                            </div>
                            <div id="questionCounter"></div>
-                           <button class="end-interview" onclick="endInterview()">End & Get Report</button>
+                           <button class="end-interview btn-secondary" onclick="endInterview()">End & Get Report</button>
                        </div>
                        <div class="chat-messages" id="chatMessages"></div>
                        <div class="chat-input-container">
-                           <input type="text" class="chat-input" placeholder="Type your response..." id="responseInput">
+                           <textarea class="chat-input" placeholder="Type your response..." id="responseInput" rows="1"></textarea>
                            <button class="chat-send" onclick="sendResponse()">➤</button>
                        </div>
                     </div>
@@ -131,3 +124,4 @@
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
+
